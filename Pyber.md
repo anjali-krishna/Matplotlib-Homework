@@ -2,6 +2,9 @@
 # Pyber Ride Sharing
 
 ### Analysis
+* Pyber is relatively successful in the urban area with higher number of rides.
+* Urban region has most number of drivers and are expensive compared to the other two.
+* Most of the rides are between 20 to 30.
 
 
 ```python
@@ -9,7 +12,9 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-%matplotlib inline
+import seaborn as sns
+import matplotlib.patches as mpatches
+from matplotlib.legend_handler import HandlerPatch
 ```
 
 
@@ -29,19 +34,6 @@ merge_data.head()
 
 
 <div>
-<style scoped>
-    .dataframe tbody tr th:only-of-type {
-        vertical-align: middle;
-    }
-
-    .dataframe tbody tr th {
-        vertical-align: top;
-    }
-
-    .dataframe thead th {
-        text-align: right;
-    }
-</style>
 <table border="1" class="dataframe">
   <thead>
     <tr style="text-align: right;">
@@ -111,16 +103,28 @@ merge_data.head()
 
 ```python
 group_city = merge_data.groupby(['city'])
-average_fare = group_city.mean()['fare']
-rides_total = group_city.count()['ride_id']
-drivers_total = group_city['driver_count'].value_counts()
-city_type = city_df['type'].unique()
+average_fare = (group_city.mean()['fare'])
+rides_total = (group_city.count()['ride_id'])
+drivers_total = group_city.driver_count.value_counts()
 
-plt.scatter(rides_total,average_fare,c=colors,s=drivers_total*10,alpha=0.75, linewidths=1, edgecolor='black')
+city_type = sorted(city_df['type'].unique())
+colors = ["Gold", "LightSkyBlue", "LightCoral"]
+sns.set_style("darkgrid")
+
+plt.scatter(rides_total, average_fare,  s=drivers_total*10,c=colors, alpha=1, linewidths=1, edgecolor='black')
+
+
+patches = [ plt.plot([],[], marker="o", ms=5, ls="",lw=1, color=colors[i], 
+            label="{:s}".format(city_type[i]) )[0]  for i in range(len(city_type)) ]
+plt.legend(handles=patches, bbox_to_anchor=(0.5, 0.5), edgecolor='black',title='City Types')
+
 
 plt.title("Pyber Ride Sharing Data (2016)")
 plt.xlabel('Total Number of Rides (Per City)')
 plt.ylabel('Average Fare ($)')
+
+# plt.xticks([0,5,10,15,20,25,30,35,40,45,50,55,60])
+plt.savefig("BubblePlot.png")
 plt.show()
 
 ```
@@ -156,19 +160,13 @@ plt.pie(sizes, explode=explode, labels=labels, colors=colors,
 #Title
 plt.title("% of Total Fares by City Type")
 
+plt.savefig("Fares.png")
 plt.show()
-total_fares
+
 ```
 
 
 ![png](output_8_0.png)
-
-
-
-
-
-    64669.120000000003
-
 
 
 ## Total Rides by City Type
@@ -194,6 +192,7 @@ plt.pie(sizes, explode=explode, labels=labels, colors=colors,
 #Title
 plt.title("% of Total Rides by City Type")
 
+plt.savefig("Rides.png")
 plt.show()
 
 ```
@@ -225,7 +224,9 @@ plt.pie(sizes, explode=explode, labels=labels, colors=colors,
 #Title
 plt.title("% of Total Drivers by City Type")
 
+plt.savefig("Drivers.png")
 plt.show()
+
 ```
 
 
